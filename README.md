@@ -1,11 +1,11 @@
-# dsh-affect · 让 AI 有「状态」，而不是每轮都在演
+# dsh-emotion · 让 AI 有「状态」，而不是每轮都在演
 
 > **你的 AI 说「我有点生气」。那句话是它编的——因为没有任何东西在替它记着这件事。**
 >
 > 这一轮它生气，下一轮它忘了；这一轮它黏你，换个会话又客客气气。
 > 不是模型不想记住，是**情绪压根不在模型手里**：它每次都在从零猜自己该是什么心情。
 
-`dsh-affect` 把这件东西**搬到模型外面**：几条情绪轴各 0–100，按你说的话加减、随时间自己漂移；每一轮开始，插件把「你现在处在哪一档、可以用哪些词」注进系统提示。
+`dsh-emotion` 把这件东西**搬到模型外面**：几条情绪轴各 0–100，按你说的话加减、随时间自己漂移；每一轮开始，插件把「你现在处在哪一档、可以用哪些词」注进系统提示。
 
 模型自己**算不出这些数字，也改不了它们**——它只能带着这个状态说话。
 
@@ -33,20 +33,20 @@
 
 ## 为什么这个做法不一样
 
-| 常见做法 | dsh-affect |
+| 常见做法 | dsh-emotion |
 |---|---|
 | 在提示词里写「你现在很生气」 | 提示词是死的，写进去就一直生气 |
 | 让模型自己评估情绪 | 模型自评＝自己给自己打分，**它会给自己打好看的分** |
 | 用一段文字演人设 | 演的是台词，不是状态；换个会话就断 |
 
-`dsh-affect` 只做一件事：**数字由插件管，说话由模型管。** 两边不越界。
+`dsh-emotion` 只做一件事：**数字由插件管，说话由模型管。** 两边不越界。
 
 ---
 
 ## 30 秒上手
 
 ```sh
-dsh plugin --profile web add github:7gzgn/dsh-affect
+dsh plugin --profile web add github:7gzgn/dsh-emotion
 ```
 
 装上之后配置是**空的**（一个轴都没有，什么也不注入）——这是故意的，它不替你决定你的 AI 该有什么情绪。
@@ -123,7 +123,7 @@ http://127.0.0.1:7799/
 
 ## English
 
-`dsh-affect` gives your agent an **external** emotion state machine: several axes (0–100) that drift over time and move when you speak to it. Each turn the plugin injects "which band you're in + which tags you may use" into the system prompt.
+`dsh-emotion` gives your agent an **external** emotion state machine: several axes (0–100) that drift over time and move when you speak to it. Each turn the plugin injects "which band you're in + which tags you may use" into the system prompt.
 
 The numbers belong to the plugin. The model cannot read them, recompute them, or argue with them — it only speaks from inside them. That is the whole point: **an emotion the model can grade itself is not a state, it's a performance.**
 
