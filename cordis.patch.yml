@@ -1,4 +1,4 @@
-# dsh-affect bundle patch：把自己插进 profile 的插件名单
+# dsh-affect bundle patch
 - insert:
     - id: plugin-emotion
       name: 'dsh-affect'
