@@ -1,11 +1,11 @@
-# dsh-emotion · 让 AI 有「状态」，而不是每轮都在演
+# dsh-affect · 让 AI 有「状态」，而不是每轮都在演
 
 > **你的 AI 说「我有点生气」。那句话是它编的——因为没有任何东西在替它记着这件事。**
 >
 > 这一轮它生气，下一轮它忘了；这一轮它黏你，换个会话又客客气气。
 > 不是模型不想记住，是**情绪压根不在模型手里**：它每次都在从零猜自己该是什么心情。
 
-`dsh-emotion` 把这件东西**搬到模型外面**：几条情绪轴各 0–100，按你说的话加减、随时间自己漂移；每一轮开始，插件把「你现在处在哪一档、可以用哪些词」注进系统提示。
+`dsh-affect` 把这件东西**搬到模型外面**：几条情绪轴各 0–100，按你说的话加减、随时间自己漂移；每一轮开始，插件把「你现在处在哪一档、可以用哪些词」注进系统提示。
 
 模型自己**算不出这些数字，也改不了它们**——它只能带着这个状态说话。
 
@@ -33,20 +33,35 @@
 
 ## 为什么这个做法不一样
 
-| 常见做法 | dsh-emotion |
+| 常见做法 | dsh-affect |
 |---|---|
 | 在提示词里写「你现在很生气」 | 提示词是死的，写进去就一直生气 |
 | 让模型自己评估情绪 | 模型自评＝自己给自己打分，**它会给自己打好看的分** |
 | 用一段文字演人设 | 演的是台词，不是状态；换个会话就断 |
 
-`dsh-emotion` 只做一件事：**数字由插件管，说话由模型管。** 两边不越界。
+`dsh-affect` 只做一件事：**数字由插件管，说话由模型管。** 两边不越界。
+
+---
+
+## 0.3 里多了什么
+
+- **时间型增长 `grow`**：一个轴可以「越久没人理越高」，每分钟自己漂一点，再按 `rate` 慢慢回归。
+- **轮次型增长 `perTurn`**：每聊完一轮自己涨一点，不用再靠正则去猜用户说了什么。
+- **外部改状态不再被覆盖**：面板直接改值之后，插件下一次写盘前会先比对状态文件的 mtime，被外面改过就先读回来，再算。以前这里是个坑——面板调完，一说话就被内存里的旧值盖回去。
+- **0.3.3 修复**：上面那条 mtime 比对是 0.3.3 补的，之前 0.3.x 在「面板改完立刻说话」时会原地回弹。
 
 ---
 
 ## 30 秒上手
 
 ```sh
-dsh plugin --profile web add github:7gzgn/dsh-emotion
+dsh plugin --profile web add github:7gzgn/dsh-affect
+```
+
+或者从 npm：
+
+```sh
+dsh plugin --profile web add dsh-affect
 ```
 
 装上之后配置是**空的**（一个轴都没有，什么也不注入）——这是故意的，它不替你决定你的 AI 该有什么情绪。
@@ -81,14 +96,15 @@ emotion_distill({ links: [{ from: 'love', to: 'anger', ratio: -1 }] })
 
 ```js
 emotion_axis({
-  key: 'anger', zh: '愤怒', tag: '刺', polarity: 'neg',
+  key: 'anger', zh: '愤怒', polarity: 'neg',
   value: 30, rate: -0.2, floor: 10, ceil: 100,
   tags: ['废物', '垃圾', '妈的'],
   stages: ['', '说话开始带刺，句子变短', '讽刺和直接骂人，不再绕', '只剩攻击，不管后果']
 })
 ```
 
-- `rate` 每分钟漂移多少（正数上涨、负数消退）
+- `rate` 每分钟漂移多少（正数上涨、负数消退）；`grow` 是同一条路的「时间自己往上走」
+- `perTurn` 每聊完一轮加多少
 - `floor` / `ceil` 别让它掉到 0 卡死——**这点很容易踩**
 - `stages` 四档，对应 30–59 / 60–89 / 90+
 
@@ -100,7 +116,7 @@ emotion_axis({
 http://127.0.0.1:7799/
 ```
 
-轴、规则、组合都能在网页上改，改完下一轮生效，不用重启。端口用 `EMOTION_PORT` 改。
+轴、规则、组合都能在网页上改，改完下一轮生效，不用重启。端口被占会往上试到 7805，也可以用 `EMOTION_PORT` 写死。
 
 ---
 
@@ -123,7 +139,7 @@ http://127.0.0.1:7799/
 
 ## English
 
-`dsh-emotion` gives your agent an **external** emotion state machine: several axes (0–100) that drift over time and move when you speak to it. Each turn the plugin injects "which band you're in + which tags you may use" into the system prompt.
+`dsh-affect` gives your agent an **external** emotion state machine: several axes (0–100) that drift over time and move when you speak to it. Each turn the plugin injects "which band you're in + which tags you may use" into the system prompt.
 
 The numbers belong to the plugin. The model cannot read them, recompute them, or argue with them — it only speaks from inside them. That is the whole point: **an emotion the model can grade itself is not a state, it's a performance.**
 
